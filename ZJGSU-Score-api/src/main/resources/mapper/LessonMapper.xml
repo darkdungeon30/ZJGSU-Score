@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.LessonMapper">
+
+    <resultMap id="BaseResultMap" type="org.example.domain.Lesson">
+            <id property="lid" column="LID" jdbcType="INTEGER"/>
+            <result property="lname" column="LName" jdbcType="VARCHAR"/>
+            <result property="lteacher" column="LTeacher" jdbcType="VARCHAR"/>
+            <result property="ldesc" column="LDesc" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        LID,LName,LTeacher,
+        LDesc
+    </sql>
+</mapper>
