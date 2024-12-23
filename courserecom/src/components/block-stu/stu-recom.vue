@@ -18,6 +18,7 @@
         <el-col :span="24">
           <div class="course-info">
             <h3>{{ course.name }}</h3>
+            <p>开课学院：{{ course.department }}</p>
             <p>任课老师：{{ course.teacher }}</p>
             <p>授课时间：{{ formatTime(course.time) }}</p>
             <p>课程简介：{{ course.description }}</p>
@@ -45,6 +46,7 @@ import * as echarts from 'echarts';
 const courses = ref([
   {
     name: '现代经济学原理',
+    department: '经济学院',
     teacher: '王老师',
     time: ['周三', '14:00', '15:30'],
     description: '本课程主要讲解现代经济学的基本原理和方法，分析市场经济的运行机制和政策影响。',
@@ -55,14 +57,16 @@ const courses = ref([
     teacher: '郑老师',
     time: ['周四', '10:00', '11:30'],
     description: '本课程旨在培养学生的音乐鉴赏能力，介绍不同音乐风格和作品。',
-    scores: [8, 9, 7, 6, 5]
+    scores: [8, 9, 7, 6, 5],
+    department: '音乐学院'
   },
   {
     name: '现代管理学',
     teacher: '陈老师',
     time: ['周一', '16:00', '17:30'],
     description: '本课程主要介绍现代管理学的基本原理和方法，探讨管理实践中的应用。',
-    scores: [7, 8, 9, 6, 5]
+    scores: [7, 8, 9, 6, 5],
+    department: '管理学院'
   },
 ]);
 
