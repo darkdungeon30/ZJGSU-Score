@@ -3,43 +3,44 @@
     <el-header class="course-list-header">
       <h2>课程列表</h2>
     </el-header>
+    <div style="display: flex">
+      <el-input
+          placeholder="请输入课程名称进行搜索"
+          class="search-input">
+      </el-input>
+      <el-button slot="append" icon="el-icon-search">搜索</el-button>
+    </div>
     <el-main class="course-list-main">
       <el-container v-if="selectedCourse" class="course-details-container">
+        <div ref="radarChart" style="width: 100%; height: 400px;"></div>
         <el-header class="course-details-header">
           <h2 style="text-align: center;">{{ selectedCourse.name }} - 课程均分详情</h2>
-          <div ref="radarChart" style="width: 100%; height: 400px;"></div>
-          <el-button @click="selectedCourse = null">关闭</el-button>
-
-          <!-- 评分表单 -->
-          <div class="rating-form">
-            <el-form :model="ratingForm" label-width="120px">
-              <el-form-item label="专业性">
-                <el-input v-model="ratingForm.professionalism" type="number" min="0" max="10" placeholder="0-10"></el-input>
-              </el-form-item>
-              <el-form-item label="生动性">
-                <el-input v-model="ratingForm.lively" type="number" min="0" max="10" placeholder="0-10"></el-input>
-              </el-form-item>
-              <el-form-item label="教师分">
-                <el-input v-model="ratingForm.teacher" type="number" min="0" max="10" placeholder="0-10"></el-input>
-              </el-form-item>
-              <el-form-item label="作业适合分">
-                <el-input v-model="ratingForm.作业适合分" type="number" min="0" max="10" placeholder="0-10"></el-input>
-              </el-form-item>
-              <el-form-item label="难度分">
-                <el-input v-model="ratingForm.difficulty" type="number" min="0" max="10" placeholder="0-10"></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="submitRating">提交评分</el-button>
-              </el-form-item>
-            </el-form>
-          </div>
         </el-header>
+        <el-form ref="courseForm" :model="selectedCourse" label-width="120px">
+          <el-form-item label="课程名称">
+            <el-input v-model="selectedCourse.name"></el-input>
+          </el-form-item>
+          <el-form-item label="开课学院">
+            <el-input v-model="selectedCourse.department"></el-input>
+          </el-form-item>
+          <el-form-item label="上课时间">
+            <el-input v-for="(time, index) in selectedCourse.time" :key="index" v-model="selectedCourse.time[index]"></el-input>
+          </el-form-item>
+          <el-form-item label="授课老师">
+            <el-input v-model="selectedCourse.teacher"></el-input>
+          </el-form-item>
+          <el-form-item label="课程简介">
+            <el-input type="textarea" v-model="selectedCourse.description"></el-input>
+          </el-form-item>
+          <el-button @click="saveAndClose">保存并关闭</el-button>
+          <el-button @click="selectedCourse = null">关闭</el-button>
+        </el-form>
       </el-container>
 
       <div class="overlay" v-if="selectedCourse"></div>
 
       <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item" @click="showCourseDetails(course)">
-        <el-col :span="24">
+        <el-col :span="18">
           <div class="course-info">
             <h3>{{ course.name }}</h3>
             <p>开课学院：{{ course.department }}</p>
@@ -47,6 +48,9 @@
             <p>授课时间：{{ formatTime(course.time) }}</p>
             <p>课程简介：{{ course.description }}</p>
           </div>
+        </el-col>
+        <el-col :span="6" class="course-actions">
+          <el-button type="danger" icon="el-icon-delete" @click.stop="deleteCourse(course)">删除课程</el-button>
         </el-col>
       </el-row>
     </el-main>
@@ -65,9 +69,39 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import * as echarts from 'echarts';
-
-// 假设的课程数据
 const courses = ref([
+  {
+    name: '人工智能导论',
+    teacher: '李老师',
+    time: ['周二', '10:00', '11:30'],
+    description: '本课程旨在介绍人工智能的基本概念、发展历程和主要技术，培养学生的创新思维和实践能力。',
+    scores: [9, 8, 7, 6, 5],
+    department: '计算机科学与技术学院'
+  },
+  {
+    name: '现代经济学原理',
+    teacher: '王老师',
+    time: ['周三', '14:00', '15:30'],
+    description: '本课程主要讲解现代经济学的基本原理和方法，分析市场经济的运行机制和政策影响。',
+    scores: [7.7, 8.6, 9.1, 5.9, 6],
+    department: '经济学院'
+  },
+  {
+    name: '心理学基础',
+    teacher: '赵老师',
+    time: ['周四', '16:00', '17:30'],
+    description: '本课程旨在帮助学生了解心理学的基础知识，包括认知、情感和行为等方面。',
+    scores: [6, 5, 7, 8, 9],
+    department: '教育学院'
+  },
+  {
+    name: '环境科学概论',
+    teacher: '钱老师',
+    time: ['周五', '8:05', '9:35'],
+    description: '本课程介绍环境科学的基本概念、原理和方法，探讨环境问题及其解决方案。',
+    scores: [8, 9, 6, 7, 5],
+    department: '环境科学与工程学院'
+  },
   {
     name: '中国传统文化',
     teacher: '孙老师',
@@ -82,7 +116,7 @@ const courses = ref([
     time: ['周二', '16:00', '17:30'],
     description: '本课程主要介绍西方哲学的发展历史，探讨各个时期的哲学思想和流派。',
     scores: [5, 6, 7, 8, 9],
-    department: '哲学院'
+    department: '哲学学院'
   },
   {
     name: '健康与营养学',
@@ -90,8 +124,48 @@ const courses = ref([
     time: ['周三', '10:00', '11:30'],
     description: '本课程旨在教授健康与营养的基本知识，帮助学生建立科学的健康观念和饮食习惯。',
     scores: [9, 7, 8, 6, 5],
-    department: '食品学院'
+    department: '公共卫生学院'
   },
+  {
+    name: '音乐鉴赏',
+    teacher: '郑老师',
+    time: ['周四', '10:00', '11:30'],
+    description: '本课程旨在培养学生的音乐鉴赏能力，介绍不同音乐风格和作品。',
+    scores: [8, 9, 7, 6, 5],
+    department: '音乐学院'
+  },
+  {
+    name: '创新创业实践',
+    teacher: '冯老师',
+    time: ['周五', '14:00', '15:30'],
+    description: '本课程旨在激发学生的创新创业精神，教授创业知识和实践技能。',
+    scores: [6, 5, 7, 8, 9],
+    department: '管理学院'
+  },
+  {
+    name: '现代管理学',
+    teacher: '陈老师',
+    time: ['周一', '16:00', '17:30'],
+    description: '本课程主要介绍现代管理学的基本原理和方法，探讨管理实践中的应用。',
+    scores: [7, 8, 9, 6, 5],
+    department: '管理学院'
+  },
+  {
+    name: '国际关系与外交',
+    teacher: '褚老师',
+    time: ['周二', '8:05', '9:35'],
+    description: '本课程旨在介绍国际关系的基本理论，分析国际政治和外交政策。',
+    scores: [5, 6, 7, 8, 9],
+    department: '国际关系学院'
+  },
+  {
+    name: '数据科学与大数据技术',
+    teacher: '卫老师',
+    time: ['周三', '16:00', '17:30'],
+    description: '本课程旨在介绍数据科学的基础知识和大数据技术，培养学生的数据思维和分析能力。',
+    scores: [9, 8, 7, 6, 5],
+    department: '信息科学与技术学院'
+  }
 ]);
 
 const selectedCourse = ref(null);
@@ -99,13 +173,6 @@ const radarChart = ref(null);
 const currentPage = ref(1);
 const itemsPerPage = ref(4);
 const totalCourses = ref(courses.value.length);
-const ratingForm = ref({
-  professionalism: null,
-  lively: null,
-  teacher: null,
-  homework: null,
-  difficulty: null
-});
 
 // 计算分页课程
 const paginatedCourses = computed(() => {
@@ -122,54 +189,10 @@ function formatTime(time) {
 // 显示课程详情和五维图
 function showCourseDetails(course) {
   selectedCourse.value = course;
-  updateRadarChart(course); // 显示课程详情时绘制雷达图
-}
-
-// 提交评分的方法
-function submitRating() {
-  if (selectedCourse.value) {
-    const newScore = [
-      ratingForm.value.professionalism,
-      ratingForm.value.lively,
-      ratingForm.value.teacher,
-      ratingForm.value.homework,
-      ratingForm.value.difficulty
-    ];
-
-    // 过滤掉无效评分（null或未定义的评分）
-    const validScores = newScore.filter(score => score !== null && score !== undefined);
-
-    // 只有在输入合法评分的情况下，将评分添加到课程中
-    if (validScores.length > 0) {
-      selectedCourse.value.scores.push(...validScores);
-      alert('评分提交成功！');
-
-      // Reset the rating form
-      ratingForm.value = {
-        professionalism: null,
-        lively: null,
-        teacher: null,
-        homework: null,
-        difficulty: null
-      };
-
-      // 重新绘制雷达图
-      updateRadarChart(selectedCourse.value); // 重新绘制雷达图
-    } else {
-      alert('请填写所有评分项。');
-    }
-
-    // 关闭详情
-    selectedCourse.value = null;
-  }
-}
-
-function updateRadarChart(course) {
   nextTick(() => {
     const myChart = echarts.init(radarChart.value);
     const labels = ['专业性', '生动性', '教师分', '作业适合分', '难度分'];
-    const scores = course.scores;
-
+    const scores = selectedCourse.value.scores;
     const option = {
       title: {
         text: ''
@@ -259,11 +282,7 @@ function handlePageChange(page) {
   z-index: 5; /* 使覆盖层在课程列表上方 */
 }
 
-.rating-form {
+.preference-chart {
   margin-top: 20px;
-}
-
-.rating-form .el-form-item {
-  margin-bottom: 15px;
 }
 </style>
