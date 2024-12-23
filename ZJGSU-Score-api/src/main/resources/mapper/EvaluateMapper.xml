@@ -11,10 +11,16 @@
             <result property="especial" column="ESpecial" jdbcType="INTEGER"/>
             <result property="escore" column="EScore" jdbcType="INTEGER"/>
             <result property="edifficult" column="EDifficult" jdbcType="INTEGER"/>
+            <result property="echeckingin" column="ECheckingin" jdbcType="INTEGER"/>
+            <result property="ework" column="EWork" jdbcType="INTEGER"/>
+            <result property="eexam" column="EExam" jdbcType="INTEGER"/>
+            <result property="efun" column="EFun" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         EID,UID,LID,
-        ESpecial,EScore,EDifficult
+        ESpecial,EScore,EDifficult,
+        ECheckingin,EWork,EExam,
+        EFun
     </sql>
 </mapper>

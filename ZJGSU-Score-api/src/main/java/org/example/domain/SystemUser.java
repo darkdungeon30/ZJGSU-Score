@@ -1,47 +1,68 @@
 package org.example.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
 
-/**
- * 
- * @TableName System_User
- */
 @TableName(value ="System_User")
 @Data
 public class SystemUser implements Serializable {
-    /**
-     * 
-     */
+
     @TableId
     private Integer uid;
 
-    /**
-     * 
-     */
     private Integer uaccount;
 
-    /**
-     * 
-     */
     private String uname;
 
-    /**
-     * 
-     */
     private String upassword;
 
-    /**
-     * 
-     */
     private Integer utype;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getUaccount() {
+        return uaccount;
+    }
+
+    public void setUaccount(Integer uaccount) {
+        this.uaccount = uaccount;
+    }
+
+    public String getUname() {
+        return uname;
+    }
+
+    public void setUname(String uname) {
+        this.uname = uname;
+    }
+
+    public Integer getUtype() {
+        return utype;
+    }
+
+    public void setUtype(Integer utype) {
+        this.utype = utype;
+    }
+
+    public String getUpassword() {
+        return upassword;
+    }
+
+    public void setUpassword(String upassword) {
+        this.upassword = upassword;
+    }
 
     @Override
     public boolean equals(Object that) {

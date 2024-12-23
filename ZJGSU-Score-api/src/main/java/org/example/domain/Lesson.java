@@ -7,36 +7,53 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
 
-/**
- * 
- * @TableName Lesson
- */
 @TableName(value ="Lesson")
 @Data
 public class Lesson implements Serializable {
-    /**
-     * 
-     */
+
     @TableId(type = IdType.AUTO)
     private Integer lid;
 
-    /**
-     * 
-     */
     private String lname;
 
-    /**
-     * 
-     */
     private String lteacher;
 
-    /**
-     * 
-     */
     private String ldesc;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public Integer getLid() {
+        return lid;
+    }
+
+    public void setLid(Integer lid) {
+        this.lid = lid;
+    }
+
+    public String getLname() {
+        return lname;
+    }
+
+    public void setLname(String lname) {
+        this.lname = lname;
+    }
+
+    public String getLteacher() {
+        return lteacher;
+    }
+
+    public void setLteacher(String lteacher) {
+        this.lteacher = lteacher;
+    }
+
+    public String getLdesc() {
+        return ldesc;
+    }
+
+    public void setLdesc(String ldesc) {
+        this.ldesc = ldesc;
+    }
 
     @Override
     public boolean equals(Object that) {
