@@ -57,40 +57,56 @@ export default {
         UPassword: ''
       },
       showRegistration: false,
-      rUser: {
-        username: '',
-        password: '',
-        ucategory: ''
-      },
       newUser: {
         UAccount: '',
-        UPassword: '',
-        UPhone: '',
-        UAddress: ''
+        UPassword: ''
       }
     };
   },
   methods: {
+    // 设置cookie
+    setCookie(name, value, days) {
+      var expires = "";
+      if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    },
+    // 获取cookie
+    getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    },
+    // 删除cookie
+    deleteCookie(name) {
+      document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    },
     async login(role) {
       if (role === 'student') {
-        if (this.student.UAccount === 'A1' && this.student.UPassword === 'A1') {
-          await router.push("/studenthome");
-          alert('学生登录成功');
-        } else if (this.student.UAccount === '') {
-          alert('请输入账号');
-        } else if (this.student.UPassword === '') {
-          alert('请输入密码');
+        const studentCookie = this.getCookie('studentInfo');
+        if (studentCookie) {
+          const [UAccount, UPassword] = studentCookie.split(':');
+          if (UAccount === this.student.UAccount && UPassword === this.student.UPassword) {
+            await router.push("/studenthome");
+            alert('学生登录成功');
+          } else {
+            alert('账号或密码错误，请重新输入');
+          }
         } else {
           alert('账号或密码错误，请重新输入');
         }
-      } else {
-        if (this.admin.UAccount === 'admin' && this.admin.UPassword === 'admin') {
+      }else{
+        if(this.admin.UAccount === "admin" && this.admin.UPassword === "admin"){
           await router.push("/adminhome");
           alert('管理员登录成功');
-        } else if (this.admin.UAccount === '') {
-          alert('请输入账号');
-        } else if (this.admin.UPassword === '') {
-          alert('请输入密码');
         } else {
           alert('账号或密码错误，请重新输入');
         }
@@ -99,15 +115,14 @@ export default {
     async registerUser() {
       const formData = {
         uaccount: this.newUser.UAccount,
-        upassword: this.newUser.UPassword,
-        uphone: this.newUser.UPhone,
-        uaddress: this.newUser.UAddress
+        upassword: this.newUser.UPassword
       };
       if (formData.uaccount === '') {
         alert('请输入账户！');
       } else if (formData.upassword === '') {
         alert('请输入密码！');
       } else {
+        this.setCookie('studentInfo', `${formData.uaccount}:${formData.upassword}`, 1); // 存储cookie，有效期为1天
         this.$router.push('/');
         alert('注册成功！请登录。');
       }
