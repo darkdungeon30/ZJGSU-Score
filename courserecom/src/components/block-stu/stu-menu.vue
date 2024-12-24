@@ -18,6 +18,9 @@
     <el-menu-item-group>
       <el-menu-item index="4">我的课程</el-menu-item>
     </el-menu-item-group>
+    <el-menu-item-group>
+      <el-menu-item index="5">评分历史</el-menu-item>
+    </el-menu-item-group>
   </el-menu>
 </template>
 
