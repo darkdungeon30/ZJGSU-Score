@@ -3,6 +3,13 @@
     <el-header class="course-list-header">
       <h2>课程列表</h2>
     </el-header>
+    <div style="display: flex">
+      <el-input
+          placeholder="请输入课程名称进行搜索"
+          class="search-input">
+      </el-input>
+      <el-button slot="append" icon="el-icon-search">搜索</el-button>
+    </div>
     <el-main class="course-list-main">
       <el-container v-if="selectedCourse" class="course-details-container">
         <el-header class="course-details-header">
@@ -12,8 +19,6 @@
             <div ref="radarChartDetails" class="chart"></div>
           </div>
           <el-button @click="selectedCourse = null">关闭</el-button>
-
-          <!-- 评分表单 -->
           <div class="rating-form">
             <el-form :model="ratingForm" label-width="120px">
               <el-form-item label="专业性">
@@ -49,6 +54,7 @@
             <p>任课老师：{{ course.teacher }}</p>
             <p>授课时间：{{ formatTime(course.time) }}</p>
             <p>课程简介：{{ course.description }}</p>
+            <p>评分时间：{{course.add_time}}</p>
           </div>
         </el-col>
         <el-col :span="6" class="course-actions">
@@ -69,39 +75,71 @@
     />
   </el-container>
 </template>
+
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import * as echarts from 'echarts';
-
-// 假设的课程数据
 const courses = ref([
+  {
+    name: '人工智能导论',
+    teacher: '李老师',
+    time: ['周二', '10:00', '11:30'],
+    description: '本课程旨在介绍人工智能的基本概念、发展历程和主要技术，培养学生的创新思维和实践能力。',
+    scores: [9, 8, 7, 6, 5],
+    scores_t: [2,5,3,4,1],
+    department: '计算机科学与技术学院',
+    add_time: '2024-12-24 20:04:00'
+  },
+  {
+    name: '现代经济学原理',
+    teacher: '王老师',
+    time: ['周三', '14:00', '15:30'],
+    description: '本课程主要讲解现代经济学的基本原理和方法，分析市场经济的运行机制和政策影响。',
+    scores: [7, 8, 9, 9, 6],
+    scores_t: [2,5,3,4,1],
+    department: '经济学院',
+    add_time: '2024-12-24 20:04:00'
+  },
   {
     name: '中国传统文化',
     teacher: '孙老师',
     time: ['周一', '14:00', '15:30'],
     description: '本课程旨在传承和弘扬中国传统文化，包括文学、艺术、哲学等多个方面。',
-    scores: [7, 6, 5, 8, 9], // 个人评分
-    scores_t: [8, 7, 6, 9, 8], // 综合评分
-    department: '文学院'
+    scores: [7, 6, 5, 8, 9],
+    scores_t: [2,5,3,4,1],
+    department: '文学院',
+    add_time: '2024-12-24 20:04:00'
   },
   {
     name: '西方哲学史',
     teacher: '周老师',
     time: ['周二', '16:00', '17:30'],
     description: '本课程主要介绍西方哲学的发展历史，探讨各个时期的哲学思想和流派。',
-    scores: [5, 6, 7, 8, 9], // 个人评分
-    scores_t: [7, 6, 5, 8, 7], // 综合评分
-    department: '哲学院'
+    scores: [5, 6, 7, 8, 9],
+    scores_t: [2,5,3,4,1],
+    department: '哲学学院',
+    add_time: '2024-12-24 20:04:00'
   },
   {
     name: '健康与营养学',
     teacher: '吴老师',
     time: ['周三', '10:00', '11:30'],
     description: '本课程旨在教授健康与营养的基本知识，帮助学生建立科学的健康观念和饮食习惯。',
-    scores: [9, 7, 8, 6, 5], // 个人评分
-    scores_t: [8, 8, 7, 7, 6], // 综合评分
-    department: '食品学院'
+    scores: [9, 7, 8, 6, 5],
+    scores_t: [2,5,3,4,1],
+    department: '公共卫生学院',
+    add_time: '2024-12-24 20:04:00'
   },
+  {
+    name: '音乐鉴赏',
+    teacher: '郑老师',
+    time: ['周四', '10:00', '11:30'],
+    description: '本课程旨在培养学生的音乐鉴赏能力，介绍不同音乐风格和作品。',
+    scores: [8, 9, 7, 6, 5],
+    scores_t: [2,5,3,4,1],
+    department: '音乐学院',
+    add_time: '2024-12-24 20:04:00'
+  }
 ]);
 
 const selectedCourse = ref(null);
