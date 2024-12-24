@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header>
+    <el-header class="course-list-header">
       <h2>新增课程</h2>
     </el-header>
     <el-main>
@@ -104,4 +104,9 @@ const resetForm = () => {
 </script>
 
 <style>
+.course-list-header h2 {
+  margin: 0;
+  color: var(--el-color-primary);
+}
+
 </style>

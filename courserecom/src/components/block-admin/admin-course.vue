@@ -50,7 +50,7 @@
           </div>
         </el-col>
         <el-col :span="6" class="course-actions">
-          <el-button type="danger" icon="el-icon-delete" @click.stop="deleteCourse(course)">删除课程</el-button>
+          <el-button class="delete-course-button" type="danger" @click.stop="deleteCourse(course)">删除课程</el-button>
         </el-col>
       </el-row>
     </el-main>
@@ -282,7 +282,13 @@ function handlePageChange(page) {
   z-index: 5; /* 使覆盖层在课程列表上方 */
 }
 
-.preference-chart {
-  margin-top: 20px;
+.course-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-course-button {
+  display: block; /* 使按钮独占整行，以便居中对齐 */
 }
 </style>
