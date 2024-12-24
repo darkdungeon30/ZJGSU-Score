@@ -20,7 +20,7 @@
         </el-header>
         <el-form ref="courseForm" :model="selectedCourse" label-width="120px">
           <el-form-item label="课程名称">
-            <el-input v-model="selectedCourse.name"></el-input>
+            <el-input v-model="selectedCourse.name" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="开课学院">
             <el-input v-model="selectedCourse.department"></el-input>
@@ -53,7 +53,7 @@
         </el-col>
         <el-col :span="6" class="course-actions">
           <div style="display: flex; flex-direction: column;text-align: center">
-            <el-button type="primary" @click="showCourseDetails(course)" style="width: 100px;margin: 10px;">查看详细</el-button>
+            <el-button type="primary" @click="showCourseDetails(course)" style="width: 100px;margin: 10px;">编辑课程</el-button>
             <el-button type="danger" @click.stop="deleteCourse(course)" style="width: 100px;margin: 10px;">删除课程</el-button>
           </div>
         </el-col>
@@ -238,6 +238,31 @@ function showCourseDetails(course) {
 // 处理页面变化
 function handlePageChange(page) {
   currentPage.value = page;
+}
+function saveAndClose() {
+  if (selectedCourse.value) {
+    // 找到选中的课程并更新其信息
+    const index = courses.value.findIndex(course => course.name === selectedCourse.value.name);
+    if (index !== -1) {
+      // 更新课程信息
+      courses.value[index] = { ...courses.value[index], ...selectedCourse.value };
+    } else {
+      // 如果未找到匹配的课程，添加新课程（假设不会重复）
+      courses.value.push(selectedCourse.value);
+    }
+    // 重置 selectedCourse 为 null
+    selectedCourse.value = null;
+    // 弹窗提示保存成功
+    alert('课程信息已保存');
+  }
+}
+
+function deleteCourse(course) {
+  const index = courses.value.findIndex(c => c.name === course.name);
+  if (index !== -1) {
+    courses.value.splice(index, 1);
+  }
+  alert("删除成功！")
 }
 </script>
 
