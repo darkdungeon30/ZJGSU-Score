@@ -5,10 +5,12 @@
     </el-header>
     <div style="display: flex">
       <el-input
+          v-model="search"
+          type="text"
           placeholder="请输入课程名称进行搜索"
           class="search-input">
       </el-input>
-      <el-button slot="append" icon="el-icon-search">搜索</el-button>
+      <el-button slot="append" icon="el-icon-search" @click="searchCourses">搜索</el-button>
     </div>
     <el-main class="course-list-main">
       <el-container v-if="selectedCourse" class="course-details-container">
@@ -79,6 +81,25 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import * as echarts from 'echarts';
+// 响应式变量，存储搜索关键词
+const search = ref('');
+const searchQuery = ref('');
+
+// 计算分页课程，包括搜索过滤
+const paginatedCourses = computed(() => {
+  if (!searchQuery.value) {
+    // 如果没有搜索关键词，返回所有课程
+    return courses.value.slice((currentPage.value - 1) * itemsPerPage.value, currentPage.value * itemsPerPage.value);
+  }
+  // 搜索时，过滤课程名称包含搜索关键词的课程
+  return courses.value
+      .filter(course => course.name.includes(searchQuery.value))
+      .slice((currentPage.value - 1) * itemsPerPage.value, currentPage.value * itemsPerPage.value);
+});
+function searchCourses() {
+  // 搜索方法可以留空，因为搜索逻辑已经在 computed 属性中实现
+  searchQuery.value=search.value;
+}
 const courses = ref([
   {
     name: '人工智能导论',
@@ -154,13 +175,6 @@ const ratingForm = ref({
   teacher: null,
   homework: null,
   difficulty: null
-});
-
-// 计算分页课程
-const paginatedCourses = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return courses.value.slice(start, end);
 });
 
 // 格式化授课时间的方法

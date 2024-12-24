@@ -5,10 +5,12 @@
     </el-header>
     <div style="display: flex">
       <el-input
+          v-model="search"
+          type="text"
           placeholder="请输入姓名/学号进行搜索"
           class="search-input">
       </el-input>
-      <el-button slot="append" icon="el-icon-search">搜索</el-button>
+      <el-button slot="append" icon="el-icon-search" @click="searchUser">搜索</el-button>
     </div>
     <el-table :data="filteredStudents" style="width: 100%">
       <el-table-column prop="name" label="姓名" width="180"></el-table-column>
@@ -31,7 +33,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { ElTable, ElTableColumn, ElButton, ElInput } from 'element-plus';
-
+const search = ref('');
 // 假设的学生信息数据列表
 const students = ref([
   {
@@ -77,6 +79,10 @@ const toggleBan = (student) => {
 const handleSearch = () => {
   // 目前该方法用于更新计算属性，无需具体实现
 };
+function searchUser() {
+  // 搜索方法可以留空，因为搜索逻辑已经在 computed 属性中实现
+  searchQuery.value=search.value;
+}
 </script>
 
 <style scoped>
