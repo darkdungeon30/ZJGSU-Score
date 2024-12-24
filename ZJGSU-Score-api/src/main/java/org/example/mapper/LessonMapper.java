@@ -1,5 +1,6 @@
 package org.example.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.example.domain.Lesson;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 

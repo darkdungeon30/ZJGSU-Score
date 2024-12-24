@@ -1,5 +1,6 @@
 package org.example.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.example.domain.Evaluate;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2024-12-23 21:28:16
 * @Entity org.example.domain.Evaluate
 */
+@Mapper
 public interface EvaluateMapper extends BaseMapper<Evaluate> {
 
 }
