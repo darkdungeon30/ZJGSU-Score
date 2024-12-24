@@ -118,11 +118,6 @@ function updateChartData() {
   padding: 20px;
 }
 
-.user-info-header h2 {
-  margin: 0;
-  color: var(--el-color-primary);
-}
-
 .user-info-main {
   padding: 20px;
 }

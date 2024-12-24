@@ -14,7 +14,7 @@
 
       <div class="overlay" v-if="selectedCourse"></div>
 
-      <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item" @click="showCourseDetails(course)">
+      <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item">
         <el-col :span="24">
           <div class="course-info">
             <h3>{{ course.name }}</h3>
@@ -22,6 +22,11 @@
             <p>任课老师：{{ course.teacher }}</p>
             <p>授课时间：{{ formatTime(course.time) }}</p>
             <p>课程简介：{{ course.description }}</p>
+          </div>
+        </el-col>
+        <el-col :span="6" class="course-actions">
+          <div style="display: flex; flex-direction: column;text-align: center">
+            <el-button type="primary" @click="showCourseDetails(course)" style="width: 100px;margin: 10px;">查看详细</el-button>
           </div>
         </el-col>
       </el-row>

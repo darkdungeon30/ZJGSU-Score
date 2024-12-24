@@ -39,7 +39,7 @@
 
       <div class="overlay" v-if="selectedCourse"></div>
 
-      <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item" @click="showCourseDetails(course)">
+      <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item">
         <el-col :span="18">
           <div class="course-info">
             <h3>{{ course.name }}</h3>
@@ -50,7 +50,10 @@
           </div>
         </el-col>
         <el-col :span="6" class="course-actions">
-          <el-button class="delete-course-button" type="danger" icon="el-icon-delete" @click.stop="deleteCourse(course)">删除课程</el-button>
+          <div style="display: flex; flex-direction: column;text-align: center">
+            <el-button type="primary" @click="showCourseDetails(course)" style="width: 100px;margin: 10px;">查看详细</el-button>
+            <el-button type="danger" @click.stop="deleteCourse(course)" style="width: 100px;margin: 10px;">删除课程</el-button>
+          </div>
         </el-col>
       </el-row>
     </el-main>
