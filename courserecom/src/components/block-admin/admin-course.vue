@@ -50,7 +50,7 @@
           </div>
         </el-col>
         <el-col :span="6" class="course-actions">
-          <el-button class="delete-course-button" type="danger" @click.stop="deleteCourse(course)">删除课程</el-button>
+          <el-button class="delete-course-button" type="danger" icon="el-icon-delete" @click.stop="deleteCourse(course)">删除课程</el-button>
         </el-col>
       </el-row>
     </el-main>

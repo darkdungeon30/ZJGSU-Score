@@ -15,9 +15,10 @@
       <el-container>
         <!-- 主要内容区域 -->
         <el-main style="height: 100%">
-          <div style="height: 400px;display: contents">
-            <component :is="currentComponent"></component>
-          </div>
+          <transition name="slide" mode="out-in">
+            <!-- 使用 :key 来强制 Vue 重新渲染组件 -->
+            <component :is="currentComponent" :key="currentComponent.name"></component>
+          </transition>
         </el-main>
       </el-container>
     </div>
@@ -87,5 +88,12 @@ html, body, #app {
 .logo img {
   max-width: 100%; /* Ensure the logo scales with the container */
   height: 100%; /* Ensures logo height matches container */
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.5s;
+}
+.slide-enter, .slide-leave-to {
+  transform: translateX(100%);
 }
 </style>
