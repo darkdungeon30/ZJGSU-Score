@@ -33,6 +33,7 @@ import UserInfo from "@/components/block-stu/stu-userinfo.vue";
 import AllCourse from "@/components/block-stu/all-course.vue";
 import CRecommend from "@/components/block-stu/stu-recom.vue";
 import CAssess from "@/components/block-stu/stu-assess.vue";
+import SHistory from "@/components/block-stu/stu-history.vue";
 
 // 定义一个响应式变量来存储当前显示的组件
 const currentComponent = ref(UserInfo);
@@ -50,6 +51,9 @@ const handleMenuClick = (index) => {
       break;
     case '4':
       currentComponent.value = CAssess;
+      break;
+    case '5':
+      currentComponent.value = SHistory;
       break;
   }
 };
