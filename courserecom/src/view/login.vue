@@ -44,7 +44,7 @@
 import router from "@/router/index.js";
 
 export default {
-  components: {  },
+  components: {},
   data() {
     return {
       role: 'student',
@@ -72,12 +72,29 @@ export default {
   },
   methods: {
     async login(role) {
-      if(role === 'student') {
-        await router.push("/studenthome")
-      }else{
-        await router.push("/adminhome")
+      if (role === 'student') {
+        if (this.student.UAccount === 'A1' && this.student.UPassword === 'A1') {
+          await router.push("/studenthome");
+          alert('学生登录成功');
+        } else if (this.student.UAccount === '') {
+          alert('请输入账号');
+        } else if (this.student.UPassword === '') {
+          alert('请输入密码');
+        } else {
+          alert('账号或密码错误，请重新输入');
+        }
+      } else {
+        if (this.admin.UAccount === 'admin' && this.admin.UPassword === 'admin') {
+          await router.push("/adminhome");
+          alert('管理员登录成功');
+        } else if (this.admin.UAccount === '') {
+          alert('请输入账号');
+        } else if (this.admin.UPassword === '') {
+          alert('请输入密码');
+        } else {
+          alert('账号或密码错误，请重新输入');
+        }
       }
-
     },
     async registerUser() {
       const formData = {
@@ -86,11 +103,11 @@ export default {
         uphone: this.newUser.UPhone,
         uaddress: this.newUser.UAddress
       };
-      if (formData.uaccount === ''){
+      if (formData.uaccount === '') {
         alert('请输入账户！');
-      }else if(formData.upassword === ''){
+      } else if (formData.upassword === '') {
         alert('请输入密码！');
-      }else{
+      } else {
         this.$router.push('/');
         alert('注册成功！请登录。');
       }
@@ -114,6 +131,7 @@ export default {
   margin: 0;
   background-color: #f4f4f4;
 }
+
 .card {
   background: white;
   padding: 20px;
@@ -123,11 +141,13 @@ export default {
   width: 100vw; /* 调整卡片宽度铺满整个视口 */
   height: 100vh; /* 调整卡片高度铺满整个视口 */
 }
+
 .logo {
   position: absolute;
   top: 0;
   left: 0;
 }
+
 input[type="text"], input[type="password"], input[type="email"], input[type="address"] {
   width: 100%;
   padding: 10px;
@@ -135,6 +155,7 @@ input[type="text"], input[type="password"], input[type="email"], input[type="add
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+
 button {
   width: 100%;
   padding: 10px;
@@ -144,9 +165,11 @@ button {
   color: white;
   cursor: pointer;
 }
+
 button:hover {
   background-color: #2dacda;
 }
+
 .registration-modal {
   position: fixed;
   top: 50%;
