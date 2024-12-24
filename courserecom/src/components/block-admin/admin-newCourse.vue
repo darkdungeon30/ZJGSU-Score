@@ -6,24 +6,24 @@
     <el-main>
       <el-form ref="courseForm" :model="courseForm" label-width="120px">
         <el-form-item label="课程名">
-          <el-input v-model="courseForm.name"></el-input>
+          <el-input v-model="courseForm.name" placeholder="请输入课程名" aria-required="true" @input="onInput"></el-input>
         </el-form-item>
         <el-form-item label="课程编号">
-          <el-input v-model="courseForm.code"></el-input>
+          <el-input v-model="courseForm.code" placeholder="请输入课程编号" aria-required="true" @input="onInput"></el-input>
         </el-form-item>
         <el-form-item label="开课学院">
-          <el-input v-model="courseForm.academy"></el-input>
+          <el-input v-model="courseForm.academy" placeholder="请输入开课学院" aria-required="true" @input="onInput"></el-input>
         </el-form-item>
         <el-form-item label="任课老师">
-          <el-input v-model="courseForm.teacher"></el-input>
+          <el-input v-model="courseForm.teacher" placeholder="请输入任课老师" aria-required="true" @input="onInput"></el-input>
         </el-form-item>
         <el-form-item label="授课时间">
           <el-checkbox-group v-model="courseForm.days" @change="handleDaysChange">
-            <el-checkbox label="周一">周一</el-checkbox>
-            <el-checkbox label="周二">周二</el-checkbox>
-            <el-checkbox label="周三">周三</el-checkbox>
-            <el-checkbox label="周四">周四</el-checkbox>
-            <el-checkbox label="周五">周五</el-checkbox>
+            <el-checkbox label="周一" @change="handleCheckedChange()">周一</el-checkbox>
+            <el-checkbox label="周二" @change="handleCheckedChange()">周二</el-checkbox>
+            <el-checkbox label="周三" @change="handleCheckedChange()">周三</el-checkbox>
+            <el-checkbox label="周四" @change="handleCheckedChange()">周四</el-checkbox>
+            <el-checkbox label="周五" @change="handleCheckedChange()">周五</el-checkbox>
           </el-checkbox-group>
           <el-time-picker
               v-model="courseForm.startTime"
@@ -41,6 +41,7 @@
               type="textarea"
               v-model="courseForm.description"
               placeholder="请输入课程简介"
+              @input="onInput"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -66,9 +67,11 @@ import {
   ElHeader,
   ElMain
 } from 'element-plus';
+
 const handleDaysChange = (value) => {
   console.log('选中的天数变化:', value);
 };
+
 const courseForm = ref({
   name: '',
   code: '',
@@ -80,13 +83,19 @@ const courseForm = ref({
   description: ''
 });
 
+// 定义一个本地的courses数组来存储课程数据
+const courses = ref([]);
+
 const timePickerOptions = {
   selectableRange: '00:00:00 - 23:59:59'
 };
 
 const submitForm = () => {
   console.log('提交表单', courseForm.value);
-  // 这里可以添加提交表单的逻辑，例如发送请求到后端
+  // 将courseForm中的数据添加到courses数组中
+  courses.value.push(courseForm.value);
+  alert("提交成功！")
+  resetForm();
 };
 
 const resetForm = () => {
@@ -100,7 +109,16 @@ const resetForm = () => {
     endTime: '',
     description: ''
   };
+  alert("重置成功")
 };
+
+function onInput() {
+  this.$forceUpdate();
+  }
+
+function handleCheckedChange() {
+  this.$forceUpdate();
+}
 </script>
 
 <style>
@@ -108,5 +126,4 @@ const resetForm = () => {
   margin: 0;
   color: var(--el-color-primary);
 }
-
 </style>
