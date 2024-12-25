@@ -1,8 +1,10 @@
 package org.example.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.example.domain.Evaluate;
+import org.example.domain.Lesson;
 import org.example.domain.SystemUser;
 import org.example.service.EvaluateService;
 import org.example.service.SystemUserService;
@@ -36,5 +38,11 @@ public class EvaluateController {
     @RequestMapping("/list")
     public List<Evaluate> list() {
         return evaluateService.list();
+    }
+    @RequestMapping("/get_by_lid/{id}")
+    public List<Evaluate> get_by_lid(@PathVariable int id) {
+        LambdaQueryWrapper<Evaluate> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Evaluate::getLid,id);
+        return evaluateService.list(lambdaQueryWrapper);
     }
 }
