@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
 * @author 小假
 * @description 针对表【Evaluate】的数据库操作Service实现
-* @createDate 2024-12-23 21:28:16
+* @createDate 2024-12-25 15:28:02
 */
 @Service
 public class EvaluateServiceImpl extends ServiceImpl<EvaluateMapper, Evaluate>
