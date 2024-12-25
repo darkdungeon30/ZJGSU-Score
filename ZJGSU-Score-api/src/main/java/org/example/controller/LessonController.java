@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.example.domain.Lesson;
@@ -34,5 +35,11 @@ public class LessonController {
     @RequestMapping("/list")
     public List<Lesson> list() {
         return lessonService.list();
+    }
+    @RequestMapping("/get_by_lid/{id}")
+    public List<Lesson> get_by_lid(@PathVariable int id) {
+        LambdaQueryWrapper<Lesson> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Lesson::getLid,id);
+        return lessonService.list(lambdaQueryWrapper);
     }
 }
