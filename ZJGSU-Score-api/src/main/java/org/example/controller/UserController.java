@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.example.domain.Lesson;
@@ -35,5 +36,12 @@ public class UserController {
     @RequestMapping("/list")
     public List<SystemUser> list() {
         return systemUserService.list();
+    }
+    @RequestMapping("/login")
+    public List<SystemUser> login(@RequestBody SystemUser systemUser) {
+        LambdaQueryWrapper<SystemUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(SystemUser::getUaccount,systemUser.getUaccount());
+        lambdaQueryWrapper.eq(SystemUser::getUpassword,systemUser.getUpassword());
+        return systemUserService.list(lambdaQueryWrapper);
     }
 }
