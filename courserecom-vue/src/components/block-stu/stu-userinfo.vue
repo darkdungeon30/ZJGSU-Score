@@ -29,7 +29,7 @@
         <el-form-item label="专业性">
           <el-input-number v-model="preferences[0].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
-        <el-form-item label="生动性">
+        <el-form-item label="趣味性">
           <el-input-number v-model="preferences[1].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
         <el-form-item label="给分情况">
@@ -59,7 +59,7 @@ const token = localStorage.getItem('token');
 const claims = jwtDecode(token);
 const preferences = ref([
   {label: '专业性', score: 0},
-  {label: '生动性', score: 0},
+  {label: '趣味性', score: 0},
   {label: '给分情况', score: 0},
   {label: '期末难度', score: 0},
   {label: '难度分', score: 0}
