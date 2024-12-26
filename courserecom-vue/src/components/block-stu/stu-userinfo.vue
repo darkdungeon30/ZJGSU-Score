@@ -8,13 +8,13 @@
         <el-col :span="12">
           <div class="info-item">
             <span class="info-label">学号:</span>
-            <span class="info-value">{{ userInfo.uaccount }}</span>
+            <span class="info-value">{{ claims.account }}</span>
           </div>
         </el-col>
         <el-col :span="12">
           <div class="info-item">
             <span class="info-label">姓名:</span>
-            <span class="info-value">{{ userInfo.uname }}</span>
+            <span class="info-value">{{ claims.name }}</span>
           </div>
         </el-col>
       </el-row>
@@ -22,7 +22,8 @@
         <div ref="radarChart" style="width: 100%; height: 400px;"></div>
       </div>
       <!-- 新增按钮 -->
-      <el-button @click="showForm = !showForm">修改偏好</el-button>
+      <el-button v-if="showForm" @click="showForm = !showForm">取消</el-button>
+      <el-button v-if="!showForm" @click="showForm = !showForm">修改偏好</el-button>
       <!-- 新增表单 -->
       <el-form v-if="showForm" label-width="100px">
         <el-form-item label="专业性">
@@ -31,7 +32,7 @@
         <el-form-item label="生动性">
           <el-input-number v-model="preferences[1].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
-        <el-form-item label="教师分">
+        <el-form-item label="作业适合分">
           <el-input-number v-model="preferences[2].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
         <el-form-item label="作业适合分">
@@ -41,7 +42,7 @@
           <el-input-number v-model="preferences[4].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="updateChartData">更新图表</el-button>
+          <el-button type="primary" @click="submitPreferences">更新</el-button>
         </el-form-item>
       </el-form>
     </el-main>
@@ -49,26 +50,38 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 import * as echarts from 'echarts';
+import {jwtDecode} from "jwt-decode";
+import axios from 'axios';
 
-const userInfo = ref({
-  studentId: '20240001',
-  major: '计算机科学与技术'
-});
-
+const token = localStorage.getItem('token');
+const claims = jwtDecode(token);
 const preferences = ref([
-  { label: '专业性', score: 8 },
-  { label: '生动性', score: 7 },
-  { label: '教师分', score: 9 },
-  { label: '作业适合分', score: 6 },
-  { label: '难度分', score: 5 }
+  {label: '专业性', score: 0},
+  {label: '生动性', score: 0},
+  {label: '给分情况', score: 0},
+  {label: '作业适合分', score: 0},
+  {label: '难度分', score: 0}
 ]);
 
 const radarChart = ref(null);
 const showForm = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
+  const uid = claims.id; // 确保你的JWT中有uid字段
+  const response = await axios.get(`http://localhost:8090/user/info/${uid}`);
+  const userData = response.data; // 假设后端返回的数据结构
+  console.log("用户数据：",userData);
+  // 映射数据到preferences
+  preferences.value = [
+    {label: '专业性', score: userData.uspecial},
+    {label: '生动性', score: userData.ufun},
+    {label: '给分情况', score: userData.uscore},
+    {label: '期末难度', score: userData.uexam},
+    {label: '难度分', score: userData.udifficult}
+  ];
+
   const myChart = echarts.init(radarChart.value);
   const labels = preferences.value.map(item => item.label);
   const scores = preferences.value.map(item => item.score);
@@ -82,7 +95,7 @@ onMounted(() => {
       data: ['偏好评分']
     },
     radar: {
-      indicator: labels.map(label => ({ name: label, max: 10 })),
+      indicator: labels.map(label => ({name: label, max: 10})),
       shape: 'circle'
     },
     series: [{
@@ -97,7 +110,32 @@ onMounted(() => {
 
   myChart.setOption(option);
 });
+async function submitPreferences() {
+  try {
+    const uid = claims.id; // 确保你的JWT中有uid字段
+    const systemUser = {
+      uid: uid,
+      uspecial: preferences.value[0].score,
+      ufun: preferences.value[1].score,
+      uscore: preferences.value[2].score,
+      uexam: preferences.value[3].score,
+      udifficult: preferences.value[4].score
+    };
 
+    const response = await axios.post('http://localhost:8090/user/update', systemUser);
+    if (response.data) {
+      console.log('偏好更新成功');
+      updateChartData(); // 更新图表数据
+      showForm.value = false; // 隐藏表单
+    } else {
+      // 处理错误情况
+      console.error('偏好更新失败');
+    }
+  } catch (error) {
+    // 处理异常情况
+    console.error('偏好更新异常', error);
+  }
+}
 // 新增更新图表的方法
 function updateChartData() {
   const myChart = echarts.getInstanceByDom(radarChart.value);

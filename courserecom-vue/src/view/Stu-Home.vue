@@ -17,7 +17,7 @@
         <el-main style="height: 100%">
           <transition name="slide" mode="out-in">
             <!-- 使用 :key 来强制 Vue 重新渲染组件 -->
-            <component :is="currentComponent" :key="currentComponent.name"></component>
+            <component :is="currentComponent" :key="currentComponent.name" v-bind="claims"></component>
           </transition>
         </el-main>
       </el-container>
@@ -34,10 +34,13 @@ import AllCourse from "@/components/block-stu/all-course.vue";
 import CRecommend from "@/components/block-stu/stu-recom.vue";
 import CAssess from "@/components/block-stu/stu-assess.vue";
 import SHistory from "@/components/block-stu/stu-history.vue";
-
+import { jwtDecode } from 'jwt-decode';
+// 读取token并解析
+const token = localStorage.getItem('token');
+const claims = token ? jwtDecode(token) : null;
+console.log("解析后：",claims);
 // 定义一个响应式变量来存储当前显示的组件
 const currentComponent = ref(UserInfo);
-
 const handleMenuClick = (index) => {
   switch (index) {
     case '1':

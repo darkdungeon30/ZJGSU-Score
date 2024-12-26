@@ -156,10 +156,10 @@ async function showCourseDetails(course) {
     option.title = [{
       text: '综合评价：' + erecommendValue.toFixed(2),
       left: 'right',
-      top: 20,
+      top: 40,
       textStyle: {
         color: '#333',
-        fontSize: 16
+        fontSize: 32
       }
     }];
 
