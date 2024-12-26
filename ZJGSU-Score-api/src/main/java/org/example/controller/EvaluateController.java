@@ -32,7 +32,7 @@ public class EvaluateController {
     @RequestMapping("/update")
     public boolean update(@RequestBody Evaluate evaluate) {
         LambdaUpdateWrapper<Evaluate> UpdateWrapper = new LambdaUpdateWrapper<>();
-        UpdateWrapper.eq(Evaluate::getUid,evaluate.getUid());
+        UpdateWrapper.eq(Evaluate::getEid,evaluate.getEid());
         return evaluateService.update(evaluate,UpdateWrapper);
     }
     @RequestMapping("/list")
