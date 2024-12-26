@@ -45,4 +45,17 @@ public class EvaluateController {
         lambdaQueryWrapper.eq(Evaluate::getLid,id);
         return evaluateService.list(lambdaQueryWrapper);
     }
+    @RequestMapping("/get_by_uid/{id}")
+    public List<Evaluate> get_by_uid(@PathVariable int id) {
+        LambdaQueryWrapper<Evaluate> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Evaluate::getUid,id);
+        return evaluateService.list(lambdaQueryWrapper);
+    }
+    @RequestMapping("/search")
+    public List<Evaluate> get_by_uid(@RequestBody Evaluate evaluate) {
+        LambdaQueryWrapper<Evaluate> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Evaluate::getUid,evaluate.getUid());
+        lambdaQueryWrapper.eq(Evaluate::getLid,evaluate.getLid());
+        return evaluateService.list(lambdaQueryWrapper);
+    }
 }
