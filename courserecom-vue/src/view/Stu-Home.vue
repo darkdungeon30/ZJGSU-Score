@@ -33,7 +33,6 @@ import UserInfo from "@/components/block-stu/stu-userinfo.vue";
 import AllCourse from "@/components/block-stu/all-course.vue";
 import CRecommend from "@/components/block-stu/stu-recom.vue";
 import CAssess from "@/components/block-stu/stu-assess.vue";
-import SHistory from "@/components/block-stu/stu-history.vue";
 import { jwtDecode } from 'jwt-decode';
 // 读取token并解析
 const token = localStorage.getItem('token');
@@ -54,9 +53,6 @@ const handleMenuClick = (index) => {
       break;
     case '4':
       currentComponent.value = CAssess;
-      break;
-    case '5':
-      currentComponent.value = SHistory;
       break;
   }
 };

@@ -7,21 +7,23 @@
       <el-container v-if="selectedCourse" class="course-details-container">
         <el-header class="course-details-header">
           <h2 style="text-align: center;">{{ selectedCourse.name }} - 课程均分详情</h2>
-          <div ref="radarChart" style="width: 100%; height: 400px;"></div>
+          <div class="radar-charts">
+            <div ref="radarChart" style="width: 50%; height: 400px; display: inline-block;"></div>
+            <div ref="radarChartStu" style="width: 50%; height: 400px; display: inline-block;"></div>
+          </div>
           <el-button @click="selectedCourse = null">关闭</el-button>
         </el-header>
       </el-container>
 
       <div class="overlay" v-if="selectedCourse"></div>
 
-      <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item">
+      <el-row v-for="course in paginatedCourses" :key="course.lid" class="course-item">
         <el-col :span="24">
           <div class="course-info">
-            <h3>{{ course.name }}</h3>
-            <p>开课学院：{{ course.department }}</p>
-            <p>任课老师：{{ course.teacher }}</p>
-            <p>授课时间：{{ formatTime(course.time) }}</p>
-            <p>课程简介：{{ course.description }}</p>
+            <h3>{{ course.lname }}</h3>
+            <p>任课老师：{{ course.lteacher }}</p>
+            <p>课程简介：{{ course.ldesc }}</p>
+            <p>匹配分数：{{ course.score.toFixed(2) }} %</p>
           </div>
         </el-col>
         <el-col :span="6" class="course-actions">
@@ -46,79 +48,150 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import * as echarts from 'echarts';
+import { jwtDecode } from "jwt-decode";
+import axios from 'axios';
+import { ElMessage } from "element-plus";
 
-// 假设的课程数据
-const courses = ref([
-  {
-    name: '现代经济学原理',
-    department: '经济学院',
-    teacher: '王老师',
-    time: ['周三', '14:00', '15:30'],
-    description: '本课程主要讲解现代经济学的基本原理和方法，分析市场经济的运行机制和政策影响。',
-    scores: [7, 8, 9, 5, 6]
-  },
-  {
-    name: '音乐鉴赏',
-    teacher: '郑老师',
-    time: ['周四', '10:00', '11:30'],
-    description: '本课程旨在培养学生的音乐鉴赏能力，介绍不同音乐风格和作品。',
-    scores: [8, 9, 7, 6, 5],
-    department: '音乐学院'
-  },
-  {
-    name: '现代管理学',
-    teacher: '陈老师',
-    time: ['周一', '16:00', '17:30'],
-    description: '本课程主要介绍现代管理学的基本原理和方法，探讨管理实践中的应用。',
-    scores: [7, 8, 9, 6, 5],
-    department: '管理学院'
-  },
-]);
-
+const token = localStorage.getItem('token');
+const claims = jwtDecode(token);
+const courses = ref([]);
 const selectedCourse = ref(null);
 const radarChart = ref(null);
+const radarChartStu = ref(null);
 const currentPage = ref(1);
-const itemsPerPage = ref(4);
-const totalCourses = ref(courses.value.length);
+const itemsPerPage = ref(3);
+const totalCourses = ref(0);
+const userPreferences = ref([]);
 
-// 计算分页课程
 const paginatedCourses = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
   return courses.value.slice(start, end);
 });
 
-// 格式化授课时间的方法
-function formatTime(time) {
-  return `${time[0]} ${time[1]}-${time[2]}`;
+async function fetchEvaluates(course) {
+  try {
+    const response = await axios.get(`http://localhost:8090/evaluate/get_by_lid/${course.lid}`);
+    if (!response.data) {
+      throw new Error("No data received");
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Fetching evaluates failed:', error);
+    ElMessage.error("获取评分详情失败，请检查网络或联系管理员！");
+    return [];
+  }
 }
 
-// 显示课程详情和五维图
-function showCourseDetails(course) {
-  selectedCourse.value = course;
-  nextTick(() => {
-    const myChart = echarts.init(radarChart.value);
-    const labels = ['专业性', '生动性', '教师分', '作业适合分', '难度分'];
-    const scores = selectedCourse.value.scores;
-    const option = {
-      title: {
-        text: ''
+function calcCourseScores(evaluates) {
+  const scores = evaluates;
+  const scoreKeys = ['especial', 'efun', 'escore', 'eexam', 'edifficult', 'erecommend'];
+  const labels = ['专业性', '趣味分', '给分情况', '期末难度', '难度分', '推荐指数'];
+  return scoreKeys.map((key, index) => {
+    const scoresForItem = scores.map(evaluate => parseFloat(evaluate[key].toFixed(2)));
+    return {
+      name: labels[index], // 使用中文标签
+      value: scoresForItem.reduce((sum, score) => sum + score, 0) / scores.length
+    };
+  });
+}
+
+async function fetchUserPrefs(uid) {
+  try {
+    const response = await axios.get(`http://localhost:8090/user/info/${uid}`);
+    return response.data;
+  } catch (error) {
+    console.error('获取用户偏好数据失败:', error);
+    ElMessage.error("获取用户偏好失败，请检查网络或联系管理员！");
+    return null;
+  }
+}
+
+async function renderPrefsChart(preferences) {
+  await nextTick(() => {
+    const myChartStu = echarts.init(radarChartStu.value);
+    const labels = ['专业性', '趣味分', '给分情况', '期末难度', '难度分'];
+    const scores = [
+      preferences.uspecial,
+      preferences.ufun,
+      preferences.uscore,
+      preferences.uexam,
+      preferences.udifficult
+    ];
+
+    const optionStu = {
+      tooltip: {},
+      legend: {
+        data: ['偏好评分']
       },
+      radar: {
+        indicator: labels.map((label, index) => ({
+          name: label,
+          max: 10
+        }))
+      },
+      series: [{
+        name: '偏好评分',
+        type: 'radar',
+        data: [{
+          value: scores,
+          name: '用户偏好'
+        }]
+      }]
+    };
+
+    myChartStu.setOption(optionStu);
+  });
+}
+
+async function showCourseDetails(course) {
+  selectedCourse.value = course;
+  const evaluates = await fetchEvaluates(course);
+  const scoreData = calcCourseScores(evaluates).map(item => ({
+    ...item,
+    value: parseFloat(item.value.toFixed(2))
+  }));
+
+  const preferences = await fetchUserPrefs(claims.id);
+  if (preferences) {
+    userPreferences.value = preferences;
+    await renderPrefsChart(preferences);
+  }
+
+  await nextTick(() => {
+    const myChart = echarts.init(radarChart.value);
+    const option = {
       tooltip: {},
       legend: {
         data: ['课程评分']
       },
       radar: {
-        indicator: labels.map(label => ({ name: label, max: 10 })),
-        shape: 'circle'
+        indicator: scoreData.filter(item => item.name !== '推荐指数').map(item => ({
+          name: item.name,
+          max: 10
+        }))
       },
       series: [{
         name: '课程评分',
         type: 'radar',
         data: [{
-          value: scores,
+          value: scoreData.filter(item => item.name !== '推荐指数').map(item => item.value),
           name: '课程评分'
         }]
+      }],
+      title: [{
+        text: '课程综合评价',
+        subtext: scoreData.find(item => item.name === '推荐指数').value.toFixed(2),
+        left: 'right',
+        top: '50%',
+        textStyle: {
+          color: '#333',
+          fontSize: 16
+        },
+        subtextStyle: {
+          color: '#666',
+          fontSize: 14
+        }
       }]
     };
 
@@ -126,10 +199,41 @@ function showCourseDetails(course) {
   });
 }
 
-// 处理页面变化
 function handlePageChange(page) {
   currentPage.value = page;
 }
+
+async function fetchCourses() {
+  try {
+    const response = await axios.get(`http://localhost:8090/recommend/${claims.id}`);
+    const recommendations = response.data;
+    const filteredLids = Object.entries(recommendations)
+        .filter(([lid, score]) => score >= 0.8)
+        .map(([lid]) => lid);
+    const coursePromises = filteredLids.map(lid => axios.get(`http://localhost:8090/lesson/info/${lid}`));
+    const courseResponses = await Promise.all(coursePromises);
+    courses.value = courseResponses.map((res, index) => {
+      const courseData = res.data;
+      const lid = filteredLids[index];
+      const score = recommendations[lid]*100;
+      courseData.score = score;
+      return courseData;
+    });
+    courses.value.sort((a, b) => b.score - a.score);
+    totalCourses.value = courses.value.length;
+  } catch (error) {
+    console.error('获取课程数据失败:', error);
+  }
+}
+
+onMounted(async () => {
+  await fetchCourses();
+  const preferences = await fetchUserPrefs(claims.id);
+  if (preferences) {
+    userPreferences.value = preferences;
+    await renderPrefsChart(preferences);
+  }
+});
 </script>
 
 <style scoped>

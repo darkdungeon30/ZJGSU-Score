@@ -115,11 +115,12 @@ async function fetchEvaluates(course) {
 }
 function calculateCourseScores(evaluates) {
   const scores = evaluates;
-  const scoreKeys = ['especial', 'escore', 'edifficult', 'eexam', 'efun','erecommend'];
-  return scoreKeys.map(key => {
-    const scoresForItem = scores.map(evaluate => evaluate[key]);
+  const scoreKeys = ['especial', 'efun', 'escore', 'eexam', 'edifficult', 'erecommend'];
+  const labels = ['专业性', '趣味分', '给分情况', '期末难度', '难度分', '推荐指数'];
+  return scoreKeys.map((key, index) => {
+    const scoresForItem = scores.map(evaluate => parseFloat(evaluate[key].toFixed(2)));
     return {
-      name: key,
+      name: labels[index], // 使用中文标签
       value: scoresForItem.reduce((sum, score) => sum + score, 0) / scores.length
     };
   });
@@ -128,7 +129,10 @@ function calculateCourseScores(evaluates) {
 async function showCourseDetails(course) {
   selectedCourse.value = course;
   const evaluates = await fetchEvaluates(course);
-  const scoreData = calculateCourseScores(evaluates);
+  const scoreData = calculateCourseScores(evaluates).map(item => ({
+    ...item,
+    value: parseFloat(item.value.toFixed(2))
+  }));
   await nextTick(() => {
     const myChart = echarts.init(radarChart.value);
     const option = {
@@ -145,7 +149,7 @@ async function showCourseDetails(course) {
             padding: [3, 5]
           }
         },
-        indicator: scoreData.filter(item => item.name !== 'erecommend').map(item => ({
+        indicator: scoreData.filter(item => item.name !== '推荐指数').map(item => ({
           name: item.name,
           max: 10
         }))
@@ -155,7 +159,7 @@ async function showCourseDetails(course) {
         type: 'radar',
         data: [
           {
-            value: scoreData.filter(item => item.name !== 'erecommend').map(item => item.value),
+            value: scoreData.filter(item => item.name !== '推荐指数').map(item => item.value),
             name: '课程评分'
           }
         ]
@@ -163,7 +167,7 @@ async function showCourseDetails(course) {
     };
 
     // 添加综合评价的文本
-    const erecommendValue = scoreData.find(item => item.name === 'erecommend').value;
+    const erecommendValue = scoreData.find(item => item.name === '推荐指数').value;
     option.title = [{
       text: '综合评价：' + erecommendValue.toFixed(2),
       left: 'right',

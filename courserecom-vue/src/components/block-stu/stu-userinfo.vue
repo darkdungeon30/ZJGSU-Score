@@ -32,10 +32,10 @@
         <el-form-item label="生动性">
           <el-input-number v-model="preferences[1].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
-        <el-form-item label="作业适合分">
+        <el-form-item label="给分情况">
           <el-input-number v-model="preferences[2].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
-        <el-form-item label="作业适合分">
+        <el-form-item label="期末难度">
           <el-input-number v-model="preferences[3].score" :min="0" :max="10"></el-input-number>
         </el-form-item>
         <el-form-item label="难度分">
@@ -61,7 +61,7 @@ const preferences = ref([
   {label: '专业性', score: 0},
   {label: '生动性', score: 0},
   {label: '给分情况', score: 0},
-  {label: '作业适合分', score: 0},
+  {label: '期末难度', score: 0},
   {label: '难度分', score: 0}
 ]);
 
@@ -76,7 +76,7 @@ onMounted(async () => {
   // 映射数据到preferences
   preferences.value = [
     {label: '专业性', score: userData.uspecial},
-    {label: '生动性', score: userData.ufun},
+    {label: '趣味分', score: userData.ufun},
     {label: '给分情况', score: userData.uscore},
     {label: '期末难度', score: userData.uexam},
     {label: '难度分', score: userData.udifficult}
