@@ -7,63 +7,66 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
 
+/**
+ * 
+ * @TableName System_User
+ */
 @TableName(value ="System_User")
 @Data
 public class SystemUser implements Serializable {
-
+    /**
+     * 
+     */
     @TableId(type = IdType.AUTO)
     private Integer uid;
 
+    /**
+     * 
+     */
     private Integer uaccount;
 
+    /**
+     * 
+     */
     private String uname;
 
+    /**
+     * 
+     */
     private String upassword;
 
+    /**
+     * 
+     */
     private Integer utype;
+
+    /**
+     * 
+     */
+    private Integer uspecial;
+
+    /**
+     * 
+     */
+    private Integer uscore;
+
+    /**
+     * 
+     */
+    private Integer udifficult;
+
+    /**
+     * 
+     */
+    private Integer uexam;
+
+    /**
+     * 
+     */
+    private Integer ufun;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
-
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public Integer getUaccount() {
-        return uaccount;
-    }
-
-    public void setUaccount(Integer uaccount) {
-        this.uaccount = uaccount;
-    }
-
-    public String getUname() {
-        return uname;
-    }
-
-    public void setUname(String uname) {
-        this.uname = uname;
-    }
-
-    public Integer getUtype() {
-        return utype;
-    }
-
-    public void setUtype(Integer utype) {
-        this.utype = utype;
-    }
-
-    public String getUpassword() {
-        return upassword;
-    }
-
-    public void setUpassword(String upassword) {
-        this.upassword = upassword;
-    }
 
     @Override
     public boolean equals(Object that) {
@@ -81,7 +84,12 @@ public class SystemUser implements Serializable {
             && (this.getUaccount() == null ? other.getUaccount() == null : this.getUaccount().equals(other.getUaccount()))
             && (this.getUname() == null ? other.getUname() == null : this.getUname().equals(other.getUname()))
             && (this.getUpassword() == null ? other.getUpassword() == null : this.getUpassword().equals(other.getUpassword()))
-            && (this.getUtype() == null ? other.getUtype() == null : this.getUtype().equals(other.getUtype()));
+            && (this.getUtype() == null ? other.getUtype() == null : this.getUtype().equals(other.getUtype()))
+            && (this.getUspecial() == null ? other.getUspecial() == null : this.getUspecial().equals(other.getUspecial()))
+            && (this.getUscore() == null ? other.getUscore() == null : this.getUscore().equals(other.getUscore()))
+            && (this.getUdifficult() == null ? other.getUdifficult() == null : this.getUdifficult().equals(other.getUdifficult()))
+            && (this.getUexam() == null ? other.getUexam() == null : this.getUexam().equals(other.getUexam()))
+            && (this.getUfun() == null ? other.getUfun() == null : this.getUfun().equals(other.getUfun()));
     }
 
     @Override
@@ -93,6 +101,11 @@ public class SystemUser implements Serializable {
         result = prime * result + ((getUname() == null) ? 0 : getUname().hashCode());
         result = prime * result + ((getUpassword() == null) ? 0 : getUpassword().hashCode());
         result = prime * result + ((getUtype() == null) ? 0 : getUtype().hashCode());
+        result = prime * result + ((getUspecial() == null) ? 0 : getUspecial().hashCode());
+        result = prime * result + ((getUscore() == null) ? 0 : getUscore().hashCode());
+        result = prime * result + ((getUdifficult() == null) ? 0 : getUdifficult().hashCode());
+        result = prime * result + ((getUexam() == null) ? 0 : getUexam().hashCode());
+        result = prime * result + ((getUfun() == null) ? 0 : getUfun().hashCode());
         return result;
     }
 
@@ -107,6 +120,11 @@ public class SystemUser implements Serializable {
         sb.append(", uname=").append(uname);
         sb.append(", upassword=").append(upassword);
         sb.append(", utype=").append(utype);
+        sb.append(", uspecial=").append(uspecial);
+        sb.append(", uscore=").append(uscore);
+        sb.append(", udifficult=").append(udifficult);
+        sb.append(", uexam=").append(uexam);
+        sb.append(", ufun=").append(ufun);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

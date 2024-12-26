@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mapper.SystemUserMapper">
 
-    <resultMap id="BaseResultMap" type="org.example.domain.SystemUser">
-            <id property="uid" column="UID" jdbcType="INTEGER"/>
-            <result property="uaccount" column="UAccount" jdbcType="INTEGER"/>
-            <result property="uname" column="UName" jdbcType="VARCHAR"/>
-            <result property="upassword" column="UPassword" jdbcType="VARCHAR"/>
-            <result property="utype" column="UType" jdbcType="INTEGER"/>
-    </resultMap>
+	<resultMap id="BaseResultMap" type="org.example.domain.SystemUser">
+		<id property="uid" column="UID" jdbcType="INTEGER"/>
+		<result property="uaccount" column="UAccount" jdbcType="INTEGER"/>
+		<result property="uname" column="UName" jdbcType="VARCHAR"/>
+		<result property="upassword" column="UPassword" jdbcType="VARCHAR"/>
+		<result property="utype" column="UType" jdbcType="INTEGER"/>
+		<result property="uspecial" column="USpecial" jdbcType="INTEGER"/>
+		<result property="uscore" column="UScore" jdbcType="INTEGER"/>
+		<result property="udifficult" column="UDifficult" jdbcType="INTEGER"/>
+		<result property="uexam" column="UExam" jdbcType="INTEGER"/>
+		<result property="ufun" column="UFun" jdbcType="INTEGER"/>
+	</resultMap>
 
-    <sql id="Base_Column_List">
-        UID,UAccount,UName,
-        UPassword,UType
-    </sql>
+	<sql id="Base_Column_List">
+		UID,UAccount,UName,
+        UPassword,UType,USpecial,
+        UScore,UDifficult,UExam,UFun
+	</sql>
 </mapper>
