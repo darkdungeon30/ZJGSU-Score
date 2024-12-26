@@ -6,8 +6,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-//    @Autowired
-//    private JwtInterceptor jwtInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -18,11 +16,4 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600)
                 .allowedHeaders("*");
     }
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(jwtInterceptor)
-//                .addPathPatterns("/user/**","/cat/**","/goods/**","/pic/**","/user/**","/order/**","/history/**")
-//                .excludePathPatterns("/user/register","/**/options");
-//    }
-
 }

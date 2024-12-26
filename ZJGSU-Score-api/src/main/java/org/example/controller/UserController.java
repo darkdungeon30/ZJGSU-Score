@@ -6,12 +6,13 @@ import jakarta.annotation.Resource;
 import org.example.DTO.Response;
 import org.example.domain.SystemUser;
 import org.example.service.SystemUserService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.utils.JwtUtils;
+import org.example.utils.Result;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -50,11 +51,34 @@ public class UserController {
     public List<SystemUser> list() {
         return systemUserService.list();
     }
-    @RequestMapping("/login")
-    public List<SystemUser> login(@RequestBody SystemUser systemUser) {
+    @PostMapping("/login")
+    public Result login(@RequestBody SystemUser systemUser){
         LambdaQueryWrapper<SystemUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(SystemUser::getUaccount,systemUser.getUaccount());
         lambdaQueryWrapper.eq(SystemUser::getUpassword,systemUser.getUpassword());
-        return systemUserService.list(lambdaQueryWrapper);
+        SystemUser u = new SystemUser();
+        if (!systemUserService.list(lambdaQueryWrapper).isEmpty()){
+            u = systemUserService.list(lambdaQueryWrapper).getFirst();
+        }
+        else {
+            u = null;
+        }
+
+        // 如果登陆成功，生成令牌，下发令牌
+
+        if (u != null){
+            Map<String,Object> claims = new HashMap<>();
+            claims.put("id",u.getUid());
+            claims.put("account",u.getUaccount());
+            claims.put("password",u.getUpassword());
+            claims.put("name",u.getUname());
+            claims.put("type",u.getUtype());
+            String jwtcode = JwtUtils.generateJwt(claims);
+            return Result.success(jwtcode);
+        }
+        // 登陆失败，返回错误信息
+        else{
+            return Result.error("用户名或密码失败~");
+        }
     }
 }
