@@ -1,45 +1,47 @@
 <template>
-  <el-container class="course-list-container">
-    <el-header class="course-list-header">
-      <h2>课程列表</h2>
-    </el-header>
-    <div style="display: flex">
-      <el-input
-          v-model="search"
-          type="text"
-          placeholder="请输入课程名称进行搜索"
-          class="search-input">
-      </el-input>
-      <el-button slot="append" icon="el-icon-search" @click="searchCourses">搜索</el-button>
-    </div>
-    <el-main class="course-list-main">
-      <el-container v-if="selectedCourse" class="course-details-container">
-        <el-header class="course-details-header">
-          <h2 style="text-align: center;">{{ selectedCourse.name }} - 课程均分详情</h2>
+  <div class="app-container">
+    <el-container class="course-list-container">
+      <el-header class="course-list-header">
+        <h2>课程列表</h2>
+      </el-header>
+      <div style="display: flex">
+        <el-input
+            v-model="search"
+            type="text"
+            placeholder="请输入课程名称进行搜索"
+            class="search-input">
+        </el-input>
+        <el-button slot="append" icon="el-icon-search" @click="searchCourses">搜索</el-button>
+      </div>
+      <el-main class="course-list-main">
+        <el-container v-if="selectedCourse" class="course-details-container">
           <div ref="radarChart" style="width: 100%; height: 400px;"></div>
-          <el-button @click="selectedCourse = null">关闭</el-button>
-        </el-header>
-      </el-container>
+          <el-header class="course-details-header">
+            <h2 style="text-align: center;">{{ selectedCourse.lname }} - 课程均分详情</h2>
+          </el-header>
+          <el-form ref="courseForm" :model="selectedCourse" label-width="120px">
+            <el-button @click="selectedCourse = null">关闭</el-button>
+          </el-form>
+        </el-container>
 
-      <div class="overlay" v-if="selectedCourse"></div>
+        <div class="overlay" v-if="selectedCourse"></div>
 
-      <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item">
-        <el-col :span="24">
-          <div class="course-info">
-            <h3>{{ course.name }}</h3>
-            <p>开课学院：{{ course.department }}</p>
-            <p>任课老师：{{ course.teacher }}</p>
-            <p>授课时间：{{ formatTime(course.time) }}</p>
-            <p>课程简介：{{ course.description }}</p>
-          </div>
-        </el-col>
-        <el-col :span="6" class="course-actions">
-          <div style="display: flex; flex-direction: column;text-align: center">
-            <el-button type="primary" @click="showCourseDetails(course)" style="width: 100px;margin: 10px;">查看详细</el-button>
-          </div>
-        </el-col>
-      </el-row>
-    </el-main>
+        <el-row v-for="course in paginatedCourses" :key="course.name" class="course-item">
+          <el-col :span="18">
+            <div class="course-info">
+              <h3>{{ course.lname }}</h3>
+              <p>任课老师：{{ course.lteacher }}</p>
+              <p>课程简介：{{ course.ldesc }}</p>
+            </div>
+          </el-col>
+          <el-col :span="6" class="course-actions">
+            <div style="display: flex; flex-direction: column;text-align: center">
+              <el-button type="primary" @click="showCourseDetails(course)" style="width: 100px;margin: 10px;">查看详情</el-button>
+            </div>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>
     <el-pagination
         v-if="totalCourses > itemsPerPage"
         :current-page="currentPage"
@@ -48,169 +50,118 @@
         @current-change="handlePageChange"
         layout="total, prev, pager, next"
         style="margin-top: 20px; text-align: center;"
+        class="pagination-container"
     />
-  </el-container>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue';
+import {computed, nextTick, onMounted, ref} from 'vue';
 import * as echarts from 'echarts';
+import axios from "axios";
+import {ElMessage} from "element-plus";
+
+// 响应式变量
 const search = ref('');
 const searchQuery = ref('');
-const courses = ref([
-  {
-    name: '人工智能导论',
-    teacher: '李老师',
-    time: ['周二', '10:00', '11:30'],
-    description: '本课程旨在介绍人工智能的基本概念、发展历程和主要技术，培养学生的创新思维和实践能力。',
-    scores: [9, 8, 7, 6, 5],
-    department: '计算机科学与技术学院'
-  },
-  {
-    name: '现代经济学原理',
-    teacher: '王老师',
-    time: ['周三', '14:00', '15:30'],
-    description: '本课程主要讲解现代经济学的基本原理和方法，分析市场经济的运行机制和政策影响。',
-    scores: [7.7, 8.6, 9.1, 5.9, 6],
-    department: '经济学院'
-  },
-  {
-    name: '心理学基础',
-    teacher: '赵老师',
-    time: ['周四', '16:00', '17:30'],
-    description: '本课程旨在帮助学生了解心理学的基础知识，包括认知、情感和行为等方面。',
-    scores: [6, 5, 7, 8, 9],
-    department: '教育学院'
-  },
-  {
-    name: '环境科学概论',
-    teacher: '钱老师',
-    time: ['周五', '8:05', '9:35'],
-    description: '本课程介绍环境科学的基本概念、原理和方法，探讨环境问题及其解决方案。',
-    scores: [8, 9, 6, 7, 5],
-    department: '环境科学与工程学院'
-  },
-  {
-    name: '中国传统文化',
-    teacher: '孙老师',
-    time: ['周一', '14:00', '15:30'],
-    description: '本课程旨在传承和弘扬中国传统文化，包括文学、艺术、哲学等多个方面。',
-    scores: [7, 6, 5, 8, 9],
-    department: '文学院'
-  },
-  {
-    name: '西方哲学史',
-    teacher: '周老师',
-    time: ['周二', '16:00', '17:30'],
-    description: '本课程主要介绍西方哲学的发展历史，探讨各个时期的哲学思想和流派。',
-    scores: [5, 6, 7, 8, 9],
-    department: '哲学学院'
-  },
-  {
-    name: '健康与营养学',
-    teacher: '吴老师',
-    time: ['周三', '10:00', '11:30'],
-    description: '本课程旨在教授健康与营养的基本知识，帮助学生建立科学的健康观念和饮食习惯。',
-    scores: [9, 7, 8, 6, 5],
-    department: '公共卫生学院'
-  },
-  {
-    name: '音乐鉴赏',
-    teacher: '郑老师',
-    time: ['周四', '10:00', '11:30'],
-    description: '本课程旨在培养学生的音乐鉴赏能力，介绍不同音乐风格和作品。',
-    scores: [8, 9, 7, 6, 5],
-    department: '音乐学院'
-  },
-  {
-    name: '创新创业实践',
-    teacher: '冯老师',
-    time: ['周五', '14:00', '15:30'],
-    description: '本课程旨在激发学生的创新创业精神，教授创业知识和实践技能。',
-    scores: [6, 5, 7, 8, 9],
-    department: '管理学院'
-  },
-  {
-    name: '现代管理学',
-    teacher: '陈老师',
-    time: ['周一', '16:00', '17:30'],
-    description: '本课程主要介绍现代管理学的基本原理和方法，探讨管理实践中的应用。',
-    scores: [7, 8, 9, 6, 5],
-    department: '管理学院'
-  },
-  {
-    name: '国际关系与外交',
-    teacher: '褚老师',
-    time: ['周二', '8:05', '9:35'],
-    description: '本课程旨在介绍国际关系的基本理论，分析国际政治和外交政策。',
-    scores: [5, 6, 7, 8, 9],
-    department: '国际关系学院'
-  },
-  {
-    name: '数据科学与大数据技术',
-    teacher: '卫老师',
-    time: ['周三', '16:00', '17:30'],
-    description: '本课程旨在介绍数据科学的基础知识和大数据技术，培养学生的数据思维和分析能力。',
-    scores: [9, 8, 7, 6, 5],
-    department: '信息科学与技术学院'
-  }
-]);
-
+const courses = ref([]);
 const selectedCourse = ref(null);
 const radarChart = ref(null);
 const currentPage = ref(1);
 const itemsPerPage = ref(4);
-const totalCourses = ref(courses.value.length);
+const totalCourses = ref(0);
 
 // 计算分页课程，包括搜索过滤
 const paginatedCourses = computed(() => {
-  if (!searchQuery.value) {
-    // 如果没有搜索关键词，返回所有课程
-    return courses.value.slice((currentPage.value - 1) * itemsPerPage.value, currentPage.value * itemsPerPage.value);
-  }
-  // 搜索时，过滤课程名称包含搜索关键词的课程
-  return courses.value
-      .filter(course => course.name.includes(searchQuery.value))
-      .slice((currentPage.value - 1) * itemsPerPage.value, currentPage.value * itemsPerPage.value);
+  const filteredCourses = courses.value.filter(course =>
+      course.lname.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+
+  // 更新总数为过滤后的课程数量
+  totalCourses.value = filteredCourses.length;
+
+  return filteredCourses.slice((currentPage.value - 1) * itemsPerPage.value, currentPage.value * itemsPerPage.value);
 });
+
+// 搜索课程
 function searchCourses() {
-  // 搜索方法可以留空，因为搜索逻辑已经在 computed 属性中实现
-  searchQuery.value=search.value;
+  searchQuery.value = search.value;
+  currentPage.value = 1; // 重置当前页为第一页
+  // 这里不需要调用 fetchCourses()，因为 paginatedCourses 会自动更新
 }
-
-// 格式化授课时间的方法
-function formatTime(time) {
-  return `${time[0]} ${time[1]}-${time[2]}`;
+async function fetchEvaluates(course) {
+  try {
+    const response = await axios.get(`http://localhost:8090/evaluate/get_by_lid/${course.lid}`);
+    if (!response.data) {
+      throw new Error("No data received");
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Fetching evaluates failed:', error);
+    ElMessage.error("获取评分详情失败，请检查网络或联系管理员！");
+    return [];
+  }
 }
-
+function calculateCourseScores(evaluates) {
+  const scores = evaluates;
+  const scoreKeys = ['especial', 'escore', 'edifficult', 'eexam', 'efun','erecommend'];
+  return scoreKeys.map(key => {
+    const scoresForItem = scores.map(evaluate => evaluate[key]);
+    return {
+      name: key,
+      value: scoresForItem.reduce((sum, score) => sum + score, 0) / scores.length
+    };
+  });
+}
 // 显示课程详情和五维图
-function showCourseDetails(course) {
+async function showCourseDetails(course) {
   selectedCourse.value = course;
-  nextTick(() => {
+  const evaluates = await fetchEvaluates(course);
+  const scoreData = calculateCourseScores(evaluates);
+  await nextTick(() => {
     const myChart = echarts.init(radarChart.value);
-    const labels = ['专业性', '生动性', '教师分', '作业适合分', '难度分'];
-    const scores = selectedCourse.value.scores;
     const option = {
-      title: {
-        text: ''
-      },
       tooltip: {},
       legend: {
         data: ['课程评分']
       },
       radar: {
-        indicator: labels.map(label => ({ name: label, max: 10 })),
-        shape: 'circle'
+        name: {
+          textStyle: {
+            color: '#fff',
+            backgroundColor: '#999',
+            borderRadius: 3,
+            padding: [3, 5]
+          }
+        },
+        indicator: scoreData.filter(item => item.name !== 'erecommend').map(item => ({
+          name: item.name,
+          max: 10
+        }))
       },
       series: [{
         name: '课程评分',
         type: 'radar',
-        data: [{
-          value: scores,
-          name: '课程评分'
-        }]
+        data: [
+          {
+            value: scoreData.filter(item => item.name !== 'erecommend').map(item => item.value),
+            name: '课程评分'
+          }
+        ]
       }]
     };
+
+    // 添加综合评价的文本
+    const erecommendValue = scoreData.find(item => item.name === 'erecommend').value;
+    option.title = [{
+      text: '综合评价：' + erecommendValue.toFixed(2),
+      left: 'right',
+      top: 20,
+      textStyle: {
+        color: '#333',
+        fontSize: 16
+      }
+    }];
 
     myChart.setOption(option);
   });
@@ -220,10 +171,34 @@ function showCourseDetails(course) {
 function handlePageChange(page) {
   currentPage.value = page;
 }
+
+// 获取课程信息
+async function fetchCourses() {
+  try {
+    const response = await axios.get('http://localhost:8090/lesson/list');
+    if (!response.data) {
+      throw new Error("No data received");
+    }
+    courses.value = response.data;
+    totalCourses.value = courses.value.length; // 更新总数
+  } catch (error) {
+    console.error('Fetching courses failed:', error);
+  }
+}
+
+// 在组件挂载后获取课程信息
+onMounted(fetchCourses);
 </script>
 
 <style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 确保容器至少占满整个视口高度 */
+}
+
 .course-list-container {
+  flex: 1; /* 使课程列表容器占据剩余空间 */
   padding: 20px;
 }
 
@@ -279,7 +254,15 @@ function handlePageChange(page) {
   z-index: 5; /* 使覆盖层在课程列表上方 */
 }
 
-.preference-chart {
-  margin-top: 20px;
+.course-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-container {
+  margin-top: auto; /* 将分页栏推到底部 */
+  padding: 20px;
+  text-align: center;
 }
 </style>

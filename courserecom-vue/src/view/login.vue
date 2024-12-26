@@ -47,6 +47,7 @@
 import router from "@/router/index.js";
 import axios from "axios";
 import {ElMessage} from "element-plus";
+import { jwtDecode } from 'jwt-decode';
 
 export default {
   components: {},
@@ -78,22 +79,30 @@ export default {
         };
         console.log("登录：",formData)
         const response = await axios.post('http://localhost:8090/user/login', formData);
-        console.log("res:",response.data[0]);
-        if (response.data !== null) {
-          this.rUser = response.data[0];
-          console.log("role:",this.rUser.utype)
+        const token = response.data.data;
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+        const data = response.data;
+        console.log("res:",data);
+        if (data.message === "Success" && data.code === 200) {
+          this.rUser = data;
+          const token = this.rUser.data;
+          const claims = jwtDecode(token);
+          console.log("role:",claims)
           if (role === 'admin') {
-            if (this.rUser.utype === 0) {
-              // Navigate to admin home and pass UAccount
-              this.$router.push({ name: 'AdminHome' });
+            if (claims['type'] === 0) {
+              ElMessage.success('登录成功！');
+              this.$router.push({ path: '/adminhome', query: { token } });
             } else {
-              alert('登录失败，权限不足');
+              ElMessage.error('登录失败，权限不足');
             }
           } else {
-            this.$router.push({ name: 'StudentHome'});
+            ElMessage.success('登录成功！');
+            this.$router.push({ path: '/studenthome', query: { token } });
           }
         } else {
-          alert('登录失败，请检查用户名和密码是否正确');
+          ElMessage.error('登录失败，请检查用户名和密码是否正确');
         }
       } catch (error) {
         console.error('登录请求失败:', error);

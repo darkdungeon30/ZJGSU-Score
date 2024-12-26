@@ -8,13 +8,13 @@
         <el-col :span="12">
           <div class="info-item">
             <span class="info-label">学号:</span>
-            <span class="info-value">{{ userInfo.studentId }}</span>
+            <span class="info-value">{{ userInfo.uaccount }}</span>
           </div>
         </el-col>
         <el-col :span="12">
           <div class="info-item">
-            <span class="info-label">专业:</span>
-            <span class="info-value">{{ userInfo.major }}</span>
+            <span class="info-label">姓名:</span>
+            <span class="info-value">{{ userInfo.uname }}</span>
           </div>
         </el-col>
       </el-row>

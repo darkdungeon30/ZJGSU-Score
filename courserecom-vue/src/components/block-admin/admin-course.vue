@@ -125,7 +125,6 @@ function calculateCourseScores(evaluates) {
   });
 }
 // 显示课程详情和五维图
-// 显示课程详情和五维图
 async function showCourseDetails(course) {
   selectedCourse.value = course;
   const evaluates = await fetchEvaluates(course);
