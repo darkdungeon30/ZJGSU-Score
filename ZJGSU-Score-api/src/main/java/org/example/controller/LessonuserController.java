@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.example.domain.Lesson;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lessonuser")
@@ -38,5 +40,17 @@ public class LessonuserController {
     @RequestMapping("/info/{id}")
     public Lessonuser info(@PathVariable int id) {
         return lessonuserService.getById(id);
+    }
+    @RequestMapping("/lesson/{id}")
+    public int[] lesson(@PathVariable int id) {
+        LambdaQueryWrapper<Lessonuser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Lessonuser::getUid,id);
+        List<Lessonuser> llist = lessonuserService.list(lambdaQueryWrapper);
+        List<Integer> lidList = llist.stream()
+                .map(Lessonuser::getLid) // 假设Lessonuser类有一个getLid()方法
+                .collect(Collectors.toList());
+        // 将列表转换为数组
+        int[] lidArray = lidList.stream().mapToInt(Integer::intValue).toArray();
+        return lidArray;
     }
 }
