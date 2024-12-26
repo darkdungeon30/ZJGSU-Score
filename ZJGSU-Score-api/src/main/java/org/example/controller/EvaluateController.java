@@ -58,4 +58,8 @@ public class EvaluateController {
         lambdaQueryWrapper.eq(Evaluate::getLid,evaluate.getLid());
         return evaluateService.list(lambdaQueryWrapper);
     }
+    @RequestMapping("/info/{id}")
+    public Evaluate info(@PathVariable int id) {
+        return evaluateService.getById(id);
+    }
 }

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
 * @author 小假
 * @description 针对表【LessonUser】的数据库操作Service
-* @createDate 2024-12-26 12:45:33
+* @createDate 2024-12-26 19:07:54
 */
 public interface LessonuserService extends IService<Lessonuser> {
 

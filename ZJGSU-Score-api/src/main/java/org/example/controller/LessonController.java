@@ -1,6 +1,5 @@
 package org.example.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.example.domain.Lesson;
@@ -36,5 +35,8 @@ public class LessonController {
     public List<Lesson> list() {
         return lessonService.list();
     }
-
+    @RequestMapping("/info/{id}")
+    public Lesson info(@PathVariable int id) {
+        return lessonService.getById(id);
+    }
 }

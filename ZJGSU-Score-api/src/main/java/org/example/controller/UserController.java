@@ -81,4 +81,8 @@ public class UserController {
             return Result.error("用户名或密码失败~");
         }
     }
+    @RequestMapping("/info/{id}")
+    public SystemUser info(@PathVariable int id) {
+        return systemUserService.getById(id);
+    }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
 * @author 小假
 * @description 针对表【LessonUser】的数据库操作Service实现
-* @createDate 2024-12-26 12:45:33
+* @createDate 2024-12-26 19:07:54
 */
 @Service
 public class LessonuserServiceImpl extends ServiceImpl<LessonuserMapper, Lessonuser>
