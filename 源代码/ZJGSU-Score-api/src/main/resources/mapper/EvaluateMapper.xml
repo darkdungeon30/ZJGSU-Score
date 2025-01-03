@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.EvaluateMapper">
+
+    <resultMap id="BaseResultMap" type="org.example.domain.Evaluate">
+            <id property="eid" column="EID" jdbcType="INTEGER"/>
+            <result property="uid" column="UID" jdbcType="INTEGER"/>
+            <result property="lid" column="LID" jdbcType="INTEGER"/>
+            <result property="especial" column="ESpecial" jdbcType="INTEGER"/>
+            <result property="escore" column="EScore" jdbcType="INTEGER"/>
+            <result property="edifficult" column="EDifficult" jdbcType="INTEGER"/>
+            <result property="eexam" column="EExam" jdbcType="INTEGER"/>
+            <result property="efun" column="EFun" jdbcType="INTEGER"/>
+            <result property="erecommend" column="ERecommend" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        EID,UID,LID,
+        ESpecial,EScore,EDifficult,
+        EExam,EFun,ERecommend
+    </sql>
+</mapper>

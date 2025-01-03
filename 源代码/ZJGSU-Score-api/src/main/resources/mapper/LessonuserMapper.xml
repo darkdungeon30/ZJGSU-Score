@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.LessonuserMapper">
+
+    <resultMap id="BaseResultMap" type="org.example.domain.Lessonuser">
+            <id property="luid" column="LUID" jdbcType="INTEGER"/>
+            <result property="uid" column="UID" jdbcType="INTEGER"/>
+            <result property="lid" column="LID" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        LUID,UID,LID
+    </sql>
+</mapper>

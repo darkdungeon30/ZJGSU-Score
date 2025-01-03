@@ -1,0 +1,24 @@
+server:
+  port: 8090
+
+spring:
+  datasource:
+    url: jdbc:sqlite:ZJGSU-Score.db
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+    mvc:
+      static-path-pattern: /static/**
+
+  session:
+    store-type: REDIS
+    redis:
+      flush-mode: on-save
+      namespace: spring:session
+      host: localhost
+      port: 6379
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.entity
+
